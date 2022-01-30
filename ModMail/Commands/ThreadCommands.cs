@@ -1,8 +1,8 @@
-﻿using AstralModMail.Data;
-using DSharpPlus.Entities;
+﻿using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
+using ModMail.Data;
 
-namespace AstralModMail.Commands;
+namespace ModMail.Commands;
 
 public class ThreadCommands : ApplicationCommandModule
 {

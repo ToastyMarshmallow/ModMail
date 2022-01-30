@@ -1,14 +1,14 @@
 ﻿using System.ComponentModel.Design;
-using AstralModMail.Commands;
-using AstralModMail.Data;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.SlashCommands;
 using Microsoft.Extensions.Logging;
+using ModMail.Commands;
+using ModMail.Data;
 using Serilog;
 
-namespace AstralModMail;
+namespace ModMail;
 
 public class Bot
 {
@@ -239,8 +239,8 @@ public class Bot
                 Services = service
             };
             var slashCommandsExtension = client.UseSlashCommands(slashCommandConfig);
-            slashCommandsExtension.RegisterCommands<CoreCommands>(871848881141469234);
-            slashCommandsExtension.RegisterCommands<ThreadCommands>(871848881141469234);
+            slashCommandsExtension.RegisterCommands<CoreCommands>(Convert.ToUInt64(Environment.GetEnvironmentVariable("GUILD_ID")));
+            slashCommandsExtension.RegisterCommands<ThreadCommands>(Convert.ToUInt64(Environment.GetEnvironmentVariable("GUILD_ID")));
         }
     }
 }

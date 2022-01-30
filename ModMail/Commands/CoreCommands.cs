@@ -1,11 +1,11 @@
-﻿using AstralModMail.Data;
-using DSharpPlus;
+﻿using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 using DSharpPlus.SlashCommands.Attributes;
+using ModMail.Data;
 using Serilog;
 
-namespace AstralModMail.Commands;
+namespace ModMail.Commands;
 
 public class CoreCommands : ApplicationCommandModule
 {

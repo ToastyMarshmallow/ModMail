@@ -1,4 +1,4 @@
-﻿using AstralModMail;
+﻿using ModMail;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()

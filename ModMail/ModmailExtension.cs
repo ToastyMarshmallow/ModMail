@@ -1,11 +1,11 @@
-﻿using AstralModMail.Data;
-using DSharpPlus;
+﻿using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.Exceptions;
 using DSharpPlus.SlashCommands;
+using ModMail.Data;
 using Serilog;
 
-namespace AstralModMail;
+namespace ModMail;
 
 public class ModmailExtension : BaseExtension
 {

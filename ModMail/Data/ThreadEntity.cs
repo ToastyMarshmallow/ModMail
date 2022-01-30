@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AstralModMail.Data;
+namespace ModMail.Data;
 
 public class ThreadEntity
 {

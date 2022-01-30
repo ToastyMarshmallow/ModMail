@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace AstralModMail.Data;
+namespace ModMail.Data;
 
 public class DataContext : DbContext
 {
@@ -9,6 +9,6 @@ public class DataContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseNpgsql("Host=localhost; Database=AstralModmail; Username=toasty; Password=toasty;");
+        optionsBuilder.UseNpgsql("Host=localhost; Database=Modmail; Username=toasty; Password=toasty;");
     }
 }

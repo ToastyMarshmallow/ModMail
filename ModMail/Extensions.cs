@@ -2,7 +2,7 @@
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 
-namespace AstralModMail;
+namespace ModMail;
 
 public static class Extensions
 {
