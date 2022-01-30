@@ -3,6 +3,7 @@ using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.SlashCommands;
+using DSharpPlus.SlashCommands.Attributes;
 using Microsoft.Extensions.Logging;
 using ModMail.Commands;
 using ModMail.Data;
@@ -24,7 +25,7 @@ public class Bot
             TokenType = TokenType.Bot,
             MinimumLogLevel = LogLevel.Trace,
             LoggerFactory = new LoggerFactory().AddSerilog(),
-            Intents = DiscordIntents.All
+            Intents = DiscordIntents.All,
         };
         _client = new DiscordShardedClient(discordConfig);
         _client.ChannelDeleted += OnChannelDeleted;
@@ -236,9 +237,45 @@ public class Bot
             service.AddService(typeof(ModmailExtension), modmailExt);
             var slashCommandConfig = new SlashCommandsConfiguration
             {
-                Services = service
+                Services = service,
             };
             var slashCommandsExtension = client.UseSlashCommands(slashCommandConfig);
+            slashCommandsExtension.SlashCommandErrored += async (_, args) =>
+            {
+                var reply = args.Exception switch
+                {
+                    SlashExecutionChecksFailedException checksException => checksException.FailedChecks[0] switch
+                    {
+                        SlashRequireBotPermissionsAttribute => "Missing Bot permissions",
+                        SlashRequireDirectMessageAttribute => "DM only",
+                        SlashRequireGuildAttribute => "Guild only",
+                        SlashRequireOwnerAttribute => "Owner only",
+                        SlashRequirePermissionsAttribute => "Missing Bot or User permissions",
+                        SlashRequireUserPermissionsAttribute => "Missing User Permissions",
+                        _ => throw new ArgumentOutOfRangeException(),
+                    },
+                    _ => "Unknown Error"
+                };
+                await args.Context.CreateResponseAsync(reply);
+            };
+            slashCommandsExtension.ContextMenuErrored += async (_, args) =>
+            {
+                var reply = args.Exception switch
+                {
+                    SlashExecutionChecksFailedException checksException => checksException.FailedChecks[0] switch
+                    {
+                        SlashRequireBotPermissionsAttribute => "Missing Bot permissions",
+                        SlashRequireDirectMessageAttribute => "DM only",
+                        SlashRequireGuildAttribute => "Guild only",
+                        SlashRequireOwnerAttribute => "Owner only",
+                        SlashRequirePermissionsAttribute => "Missing Bot or User permissions",
+                        SlashRequireUserPermissionsAttribute => "Missing User Permissions",
+                        _ => throw new ArgumentOutOfRangeException(),
+                    },
+                    _ => "Unknown Error"
+                };
+                await args.Context.CreateResponseAsync(reply);
+            };
             slashCommandsExtension.RegisterCommands<CoreCommands>(Convert.ToUInt64(Environment.GetEnvironmentVariable("GUILD_ID")));
             slashCommandsExtension.RegisterCommands<ThreadCommands>(Convert.ToUInt64(Environment.GetEnvironmentVariable("GUILD_ID")));
         }

@@ -1,5 +1,6 @@
 ﻿using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
+using DSharpPlus.SlashCommands.Attributes;
 using ModMail.Data;
 
 namespace ModMail.Commands;
@@ -10,6 +11,7 @@ public class ThreadCommands : ApplicationCommandModule
     public ModmailExtension ModmailExtension { get; set; } = null!;
 
     [SlashCommand("reply", "Replies to a thread")]
+    [SlashRequireGuild]
     public async Task Reply(InteractionContext ctx, [Option("message", "the message to send")] string message)
     {
         var thread = DataContext.Find<ThreadEntity>(ctx.Channel.Id);
@@ -20,6 +22,7 @@ public class ThreadCommands : ApplicationCommandModule
     }
     
     [SlashCommand("areply", "Replies to a thread anonymously")]
+    [SlashRequireGuild]
     public async Task AReply(InteractionContext ctx, [Option("message", "the message to send")] string message)
     {
         var thread = DataContext.Find<ThreadEntity>(ctx.Channel.Id);
@@ -30,6 +33,7 @@ public class ThreadCommands : ApplicationCommandModule
     }
     
     [SlashCommand("close", "Closes the thread")]
+    [SlashRequireGuild]
     public async Task Close(InteractionContext ctx,
         [Option("message", "The message to close the thread with")] string message = null!)
     {

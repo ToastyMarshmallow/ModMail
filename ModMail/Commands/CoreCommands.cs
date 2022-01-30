@@ -22,6 +22,7 @@ public class CoreCommands : ApplicationCommandModule
     
     [SlashCommand("setup", "Makes channels and stuff")]
     [SlashRequireUserPermissions(Permissions.Administrator)]
+    [SlashRequireGuild]
     public async Task Setup(InteractionContext ctx)
     {
         Log.Information("Setting up {Name}", ctx.Guild.Name);
@@ -64,6 +65,7 @@ public class CoreCommands : ApplicationCommandModule
 
     [SlashCommand("contact", "Start a thread with a user")]
     [SlashRequireUserPermissions(Permissions.ManageChannels)]
+    [SlashRequireGuild]
     public async Task Contact(InteractionContext ctx, [Option("user", "The user to contact")] DiscordUser user)
     {
         var db = DataContext;
@@ -136,6 +138,7 @@ public class CoreCommands : ApplicationCommandModule
     
     [ContextMenu(ApplicationCommandType.UserContextMenu,"Contact")]
     [SlashRequireUserPermissions(Permissions.ManageChannels)]
+    [SlashRequireGuild]
     public async Task Contact(ContextMenuContext ctx)
     {
         var member = ctx.TargetMember;
