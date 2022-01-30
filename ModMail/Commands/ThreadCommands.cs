@@ -42,9 +42,12 @@ public class ThreadCommands : ApplicationCommandModule
         await ModmailExtension.CloseThread(threadEntity!, ctx.Guild.GetChannel(log), ctx, message);
     }
 
-    public override Task<bool> BeforeSlashExecutionAsync(InteractionContext ctx)
+    public override async Task<bool> BeforeSlashExecutionAsync(InteractionContext ctx)
     {
         var thread = DataContext.Find<ThreadEntity>(ctx.Channel.Id);
-        return Task.FromResult(thread != null);
+        var invoke = thread != null;
+        if (!invoke)
+            await ctx.CreateResponseAsync("Not a thread");
+        return invoke;
     }
 }
