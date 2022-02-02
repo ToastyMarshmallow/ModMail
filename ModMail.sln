@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModMail", "ModMail\ModMail.csproj", "{0A3F6373-5FA6-42E9-9DFB-94691480A31F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModMail.Data", "ModMail.Data\ModMail.Data.csproj", "{8754CDCF-A52B-4EE4-BB20-968C7AEBCFC4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModMail.LogViewer", "ModMail.LogViewer\ModMail.LogViewer.csproj", "{6AC27F7C-E9D8-4332-96C1-B45E923A88C5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +16,13 @@ Global
 		{0A3F6373-5FA6-42E9-9DFB-94691480A31F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A3F6373-5FA6-42E9-9DFB-94691480A31F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0A3F6373-5FA6-42E9-9DFB-94691480A31F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8754CDCF-A52B-4EE4-BB20-968C7AEBCFC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8754CDCF-A52B-4EE4-BB20-968C7AEBCFC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8754CDCF-A52B-4EE4-BB20-968C7AEBCFC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8754CDCF-A52B-4EE4-BB20-968C7AEBCFC4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AC27F7C-E9D8-4332-96C1-B45E923A88C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AC27F7C-E9D8-4332-96C1-B45E923A88C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AC27F7C-E9D8-4332-96C1-B45E923A88C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AC27F7C-E9D8-4332-96C1-B45E923A88C5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

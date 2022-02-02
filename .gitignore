@@ -3,4 +3,4 @@ obj/
 /packages/
 riderModule.iml
 /_ReSharper.Caches/
-AstralModMail/Config.json
+ModMail.LogViewer/appsettings.Development.json

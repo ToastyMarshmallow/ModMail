@@ -4,10 +4,13 @@ using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.SlashCommands;
 using DSharpPlus.SlashCommands.Attributes;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ModMail.Commands;
 using ModMail.Data;
+using ModMail.Data.Entities;
 using Serilog;
+using MessageType = ModMail.Data.Entities.MessageType;
 
 namespace ModMail;
 
@@ -38,8 +41,61 @@ public class Bot
         };
         _client.GuildDownloadCompleted += ClientOnGuildDownloadCompleted;
         _client.MessageCreated += OnMessageCreated;
+        _client.MessageCreated += ClientOnMessageCreated;
         _client.GuildMemberAdded += ClientOnGuildMemberAdded;
         _client.GuildMemberRemoved += ClientOnGuildMemberRemoved;
+    }
+
+    private async Task ClientOnMessageCreated(DiscordClient sender, MessageCreateEventArgs e)
+    {
+        if (e.Channel.IsPrivate || (e.Message.Flags & MessageFlags.Ephemeral) == MessageFlags.Ephemeral) return;
+        var thread = _dataContext.Threads.Where(x => x.Channel == e.Channel.Id).Include(x => x.MessageEntities).FirstOrDefault();
+        if (thread == null) return;
+        while (string.IsNullOrWhiteSpace(e.Author.AvatarHash))
+            await Task.Delay(10);
+        var client = new HttpClient();
+        var attachments = new List<AttachmentEntity>();
+        foreach (var attachment in e.Message.Attachments)
+        {
+            var ms = new MemoryStream();
+            await (await client.GetStreamAsync(attachment.Url)).CopyToAsync(ms);
+            attachments.Add(new AttachmentEntity
+            {
+                MessageId = e.Message.Id,
+                Name = $"{e.Message.Id}_{attachment.FileName}",
+                Data = ms.ToArray()
+            });
+        }
+
+        var ms2 = new MemoryStream();
+        await (await client.GetStreamAsync(e.Author.AvatarUrl)).CopyToAsync(ms2);
+        var messageEntity = new MessageEntity
+        {
+            Attachments = attachments,
+            Author = e.Author.Discriminator == "0000" ? e.Author.Username : $"{e.Author.Username}#{e.Author.Discriminator}",
+            AuthorAvatar = new AvatarEntity
+            {
+                Data = ms2.ToArray(),
+                MessageId = e.Message.Id
+            },
+            Content = e.Message.Content,
+            CreatedAt = e.Message.CreationTimestamp.UtcDateTime,
+            MessageId = e.Message.Id,
+            ThreadEntity = thread,
+            ThreadId = thread.Channel,
+            Anonymous = e.Author.Username == "Anonymous",
+            Type = e.Author.Discriminator == "0000" 
+                ? e.Author.Username.Length > 11 && e.Author.Username[^11..] == "(Recipient)" 
+                    ? MessageType.Webhook 
+                    : MessageType.Reply 
+                : MessageType.Internal
+        };
+        messageEntity.Attachments.ForEach(x => x.MessageEntity = messageEntity);
+        messageEntity.AuthorAvatar.Message = messageEntity;
+        thread.MessageEntities.Add(messageEntity);
+        _dataContext.Messages.Add(messageEntity);
+        _dataContext.Update(thread);
+        await _dataContext.SaveChangesAsync();
     }
 
     private async Task ClientOnGuildMemberRemoved(DiscordClient sender, GuildMemberRemoveEventArgs e)
@@ -256,7 +312,11 @@ public class Bot
                     },
                     _ => "Unknown Error"
                 };
-                await args.Context.CreateResponseAsync(reply);
+                
+                await (await args.Context.GetOriginalResponseAsync() is null
+                    ? args.Context.CreateResponseAsync(reply)
+                    : args.Context.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(reply)));
+                Log.Error(args.Exception, "Error in {Command}", args.Context.CommandName);
             };
             slashCommandsExtension.ContextMenuErrored += async (_, args) =>
             {
@@ -274,7 +334,10 @@ public class Bot
                     },
                     _ => "Unknown Error"
                 };
-                await args.Context.CreateResponseAsync(reply);
+                await (await args.Context.GetOriginalResponseAsync() is null
+                    ? args.Context.CreateResponseAsync(reply)
+                    : args.Context.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(reply)));
+                Log.Error(args.Exception, "Error in {Command}", args.Context.CommandName);
             };
             slashCommandsExtension.RegisterCommands<CoreCommands>(Convert.ToUInt64(Environment.GetEnvironmentVariable("GUILD_ID")));
             slashCommandsExtension.RegisterCommands<ThreadCommands>(Convert.ToUInt64(Environment.GetEnvironmentVariable("GUILD_ID")));

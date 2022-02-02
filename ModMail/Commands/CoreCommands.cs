@@ -3,6 +3,7 @@ using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 using DSharpPlus.SlashCommands.Attributes;
 using ModMail.Data;
+using ModMail.Data.Entities;
 using Serilog;
 
 namespace ModMail.Commands;
@@ -51,12 +52,12 @@ public class CoreCommands : ApplicationCommandModule
             };
             db.Add(guild);
             await db.SaveChangesAsync();
-            await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder()
+            await ctx.EditResponseAsync(new DiscordWebhookBuilder()
                 .WithContent("Setup complete!"));
         }
         catch
         {
-            var msg = await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder()
+            var msg = await ctx.EditResponseAsync(new DiscordWebhookBuilder()
                 .WithContent("Setup failed!"));
             await msg.Error();
             throw;
@@ -114,7 +115,7 @@ public class CoreCommands : ApplicationCommandModule
             await ctx.DeferAsync();
             var logs = ctx.Guild.GetChannel(guild.Log);
             var thread =
-                await ModmailExtension.CreateThread(logs, member, $"A mod has contacted you from {ctx.Guild.Name}");
+                await ModmailExtension.CreateThread(logs, member, $"A mod has contacted you from {ctx.Guild.Name}", false, ctx.Member);
             var threadEntity = new ThreadEntity
             {
                 Channel = thread.Id,
@@ -173,7 +174,7 @@ public class CoreCommands : ApplicationCommandModule
             await ctx.DeferAsync();
             var logs = ctx.Guild.GetChannel(guild.Log);
             var thread =
-                await ModmailExtension.CreateThread(logs, member, $"A mod has contacted you from {ctx.Guild.Name}");
+                await ModmailExtension.CreateThread(logs, member, $"A mod has contacted you from {ctx.Guild.Name}", false, ctx.Member);
             var threadEntity = new ThreadEntity
             {
                 Channel = thread.Id,

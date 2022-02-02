@@ -3,6 +3,7 @@ using DSharpPlus.Entities;
 using DSharpPlus.Exceptions;
 using DSharpPlus.SlashCommands;
 using ModMail.Data;
+using ModMail.Data.Entities;
 using Serilog;
 
 namespace ModMail;
@@ -33,7 +34,7 @@ public class ModmailExtension : BaseExtension
             var builder = new DiscordWebhookBuilder()
                 .WithContent(message.Content.Replace("@", "\\@"))
                 .WithAvatarUrl(message.Author.AvatarUrl)
-                .WithUsername(message.Author.Username);
+                .WithUsername($"{message.Author.Username}#{message.Author.Discriminator}" + " (Recipient)");
             var client = new HttpClient();
             for (var index = 0; index < message.Attachments.Count; index++)
             {
@@ -101,7 +102,8 @@ public class ModmailExtension : BaseExtension
             }
 
             await member.SendMessageAsync(files.Any() ? builder.WithFiles(files) : builder);
-            await discordMessage.Success();
+            if (react) 
+                await discordMessage.Success();
             return true;
         }
         catch
@@ -189,9 +191,20 @@ public class ModmailExtension : BaseExtension
         return channel;
     }
 
+    public async Task SendReplyWebhookMessageInThread(DiscordChannel channel, string message, bool anon = false, DiscordMember member = null!)
+    {
+        var webhook = (await channel.GetWebhooksAsync()).FirstOrDefault(x => x.Name == "Modmail") ?? await channel.CreateWebhookAsync("Modmail");
+        await webhook.ExecuteAsync(new DiscordWebhookBuilder
+        {
+            Username = anon ? "Anonymous" : $"{member.Username}#{member.Discriminator}",
+            AvatarUrl = anon ? Client.CurrentUser.AvatarUrl : member.AvatarUrl,
+            Content = message
+        });
+    }
+
     public async Task CloseThread(ThreadEntity threadEntity, DiscordChannel log, InteractionContext ctx, string message)
     {
-        Log.Information("Closing thread {@Thread}", threadEntity);
+        Log.Information("Closing thread {@Thread:lj}", threadEntity);
         var member = await log.Guild.GetMemberAsync(threadEntity.Recipient);
         var user = await Client.GetUserAsync(threadEntity.Recipient);
 
@@ -210,10 +223,6 @@ public class ModmailExtension : BaseExtension
         _dataContext.Remove(threadEntity);
         await _dataContext.SaveChangesAsync();
         await ctx.CreateResponseAsync("Thread closed getting all messages");
-        /*
-        var messages = await ctx.Channel.GetMessagesAsync(int.MaxValue);
-        */
-        // TODO save messages to database
         await ctx.FollowUpAsync(
             new DiscordFollowupMessageBuilder().WithContent("Got all messages, will nuke the channel in 5 seconds"));
 #pragma warning disable CS4014
@@ -247,7 +256,7 @@ public class ModmailExtension : BaseExtension
     public async Task ThreadDeleted(ThreadEntity threadEntity, DiscordChannel log, DiscordMember? member,
         DiscordUser? user, string? reason)
     {
-        Log.Information("{@Thread} was deleted by {User} cuz {Reason}", threadEntity, user?.Username ?? "Unknown", reason ?? "No reason");
+        Log.Information("{@Thread:lj} was deleted by {User} cuz {Reason}", threadEntity, user?.Username ?? "Unknown", reason ?? "No reason");
         try
         {
             await

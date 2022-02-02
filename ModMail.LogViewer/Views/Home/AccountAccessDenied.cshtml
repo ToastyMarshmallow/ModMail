@@ -1,0 +1,51 @@
+﻿@model dynamic
+
+@{
+    ViewBag.Title = "Forbidden";
+    Layout = "_Layout";
+}
+<div id="background"></div>
+<div id="content">
+    <img src="~/astral-logo.png" id="astral-logo-main" alt="Astral Logo"/>
+    <h1>403 - Forbidden</h1>
+</div>
+<style>
+    * {
+        background-color: #4E4D53;
+    }
+    #astral-logo-main {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        height: 128px;
+        width: 128px;
+    }
+    h1, #astral-logo-main {
+        user-select: none;
+        color: #FFF;
+        text-align: center;
+        margin-top: 5%;
+        font-family: "Roboto", sans-serif;
+        background-color: #323335;
+    }
+    #content {
+        background-color: #323335;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        -webkit-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%); 
+        border-radius: 15px;   
+    }
+    #background {
+        border-radius: 15px;
+        background-color: #323335;
+        width: 50vmin;
+        height: 50vmin;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        -webkit-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);    
+    }
+</style>

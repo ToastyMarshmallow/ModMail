@@ -2,6 +2,7 @@
 using DSharpPlus.SlashCommands;
 using DSharpPlus.SlashCommands.Attributes;
 using ModMail.Data;
+using ModMail.Data.Entities;
 
 namespace ModMail.Commands;
 
@@ -15,9 +16,10 @@ public class ThreadCommands : ApplicationCommandModule
     public async Task Reply(InteractionContext ctx, [Option("message", "the message to send")] string message)
     {
         var thread = DataContext.Find<ThreadEntity>(ctx.Channel.Id);
-        await ctx.DeferAsync();
+        await ctx.DeferAsync(true);
         var res = await ctx.GetOriginalResponseAsync();
-        var e = await ModmailExtension.SendDmMessage(thread!, res, message, anonymous: false, mod: ctx.Member);
+        var e = await ModmailExtension.SendDmMessage(thread!, res, message, anonymous: false, mod: ctx.Member, react:false);
+        await ModmailExtension.SendReplyWebhookMessageInThread(ctx.Channel, message, false, ctx.Member);
         await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(e ? "Message Sent!" : "Idk something shat itself"));
     }
     
@@ -26,9 +28,10 @@ public class ThreadCommands : ApplicationCommandModule
     public async Task AReply(InteractionContext ctx, [Option("message", "the message to send")] string message)
     {
         var thread = DataContext.Find<ThreadEntity>(ctx.Channel.Id);
-        await ctx.DeferAsync();
+        await ctx.DeferAsync(true);
         var res = await ctx.GetOriginalResponseAsync();
-        var e = await ModmailExtension.SendDmMessage(thread!, res, message, anonymous: true);
+        var e = await ModmailExtension.SendDmMessage(thread!, res, message, anonymous: true, react:false);
+        await ModmailExtension.SendReplyWebhookMessageInThread(ctx.Channel, message, true);
         await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(e ? "Message Sent!" : "Idk something shat itself"));
     }
     
